@@ -3,7 +3,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 import time
-from sciencedirect.items import JournalItem, VolumeItem
+from sciencedirect.items import JournalItem, VolumeItem, ArticleItem
 from scrapy.item import Item
 from selenium import webdriver
 
@@ -27,17 +27,14 @@ class JournalSpider(Spider):
                 fullHref = mainUrl + href[0]
                 print name, fullHref
                 item = JournalItem()
-                item['name'] = name
-##                item['href'] = href
-
-##                items.append(item)
-                yield item
+                item['name'] = name                
                 yield Request(fullHref, callback=self.parse_articles)
-               
+                yield item
                 cn = cn + 1
                 if cn > 2:
                     break
 ##        yield items
+        return
                 
     def parse_articles(self, response):
         sel = Selector(response)
@@ -51,7 +48,7 @@ class JournalSpider(Spider):
             for href in hrefs:
                 item = ArticleItem()
 ##                yield Request(href, callback=self.parse_article)
-                item["href"] = href
+                item["title"] = href
                 yield item
                 print href
                 cn = cn + 1
