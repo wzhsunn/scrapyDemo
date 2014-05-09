@@ -10,8 +10,8 @@ from selenium import webdriver
 class JournalSpider(Spider):
     name = "journal"
     allowed_domains = ["sciencedirect.com"]
-    start_urls = [
-        "http://www.sciencedirect.com/science/journal/01559982/38"    ]
+
+    start_urls = ["http://www.sciencedirect.com/science/journal/01559982/38"]
         
     def parse(self, response):
         sel = Selector(response)
@@ -29,12 +29,15 @@ class JournalSpider(Spider):
                 item = JournalItem()
                 item['name'] = name
 ##                item['href'] = href
-                items.append(item)
+
+##                items.append(item)
+                yield item
                 yield Request(fullHref, callback=self.parse_articles)
+               
                 cn = cn + 1
                 if cn > 2:
                     break
-##        return items
+##        yield items
                 
     def parse_articles(self, response):
         sel = Selector(response)
@@ -46,8 +49,10 @@ class JournalSpider(Spider):
             hrefs = article.xpath('table/tr/td/h3/a/@href').extract()
             print hrefs
             for href in hrefs:
-##                item = ArticleItem()
-                yield Request(href, callback=self.parse_article)
+                item = ArticleItem()
+##                yield Request(href, callback=self.parse_article)
+                item["href"] = href
+                yield item
                 print href
                 cn = cn + 1
                 if cn > 2:
